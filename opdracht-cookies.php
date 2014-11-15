@@ -1,4 +1,38 @@
 <?php 
+$inglogt = false;
+$bericht = false;
+$file = file_get_contents('User.txt');
+$data =	explode( ',', $file );
+print_r($data);
+
+if ( !isset( $_COOKIE['coockienaam'] ) )  		//kijken of er al een coockie is
+{
+	if ( isset( $_POST[ 'verzend' ] ) )			//Zien of dat er iets in verzend staat
+	{
+		if ( $_POST[ 'name' ] == $data[ 0 ] && $_POST[ 'paswoord' ] == $data[ 1 ] )  //De ingevoerde waarde vergelijken met de array
+		{
+			setcookie( 'coockienaam', true, time() + 360 );		// coockie instellen
+			header( 'location: opdracht-cookies.php' );				// terug naar de pagina
+		}
+		else 												// Als de ingevoerde waarden niet overeen komen
+		{
+			$bericht = 'Er ging iets mis. Probeer opnieuw.';
+		}
+	}
+}
+else
+{
+	$bericht = 'Er ging iets mis. Probeer opnieuw.';
+	$inglogt	=	true;
+
+}
+
+if ( isset( $_GET[ 'logout' ] ) )					//als er logout in de get sta coockie verwijderen
+	{
+
+		setcookie( 'coockienaam', '', time() - 10 );	
+		header('location: opdracht-cookies.php');
+	}
 
 ?>
 
@@ -17,7 +51,12 @@
 
 	<h1>registratie</h1>
 
-	<form action="opdracht-sessions-adres.php" method="POST">
+	<?php if ($bericht): ?>
+			<?=	$bericht ?>
+		<?php endif ?>
+
+<?php if ( !$inglogt ): ?>
+	<form action="opdracht-cookies.php" method="POST">
 		<ul>
 			<li>
 				<label for="nickname">Nickname: </label>
@@ -30,6 +69,11 @@
 		</ul>
 		<input type="submit" Value="Verstuur" name="verzend">
 	</form>
+	<?php else: ?>
+
+			<a href="opdracht-cookies.php?logout=true">Uitloggen</a>
+
+	<?php endif ?>
 
 		
 
